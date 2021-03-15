@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymleaf.org">
+	  xmlns:th="http://www.thymleaf.org">
 <head>
 <meta charset="EUC-KR">
 <title>Taco Cloud</title>
 <link rel="stylesheet" th:href="@{/styles.css}" />
 </head>
 <body>
-	<form action="" method="POST" th:action="@{/orders}" th:object="${order}">
+
+	<form method="post" th:action="@{/login}" id="logoutForm">
+		<input type="submit" value="Logout"/>
+	</form>
+		
+	<form th:action="@{/orders}" id="orderForm" method="POST" th:action="@{/orders}" th:object="${order}">
 		<h1>Order your taco creation!</h1>
+		
 		<img alt="" th:src="@{/images/TacoCloud.png}"/>
+		
+		<h3>Your tacos in this order: </h3>
+		
 		<a th:href="@{/design}" id="another">Design another taco</a><br/>
 		
 		<ul>

@@ -1,5 +1,6 @@
 package tacos.web;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,7 +8,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -22,8 +22,10 @@ import tacos.Ingredient;
 import tacos.Ingredient.Type;
 import tacos.Order;
 import tacos.Taco;
+import tacos.User;
 import tacos.data.IngredientRepository;
 import tacos.data.TacoRepository;
+import tacos.data.UserRepository;
 
 @Slf4j
 @Controller
@@ -34,14 +36,17 @@ public class DesignTacoController {
 	private final IngredientRepository ingredientRepo;
 	private TacoRepository tacoRepo;
 
+	private UserRepository userRepo;
+
 	@Autowired
-	public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
+	public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository tacoRepo, UserRepository userRepo) {
 		this.ingredientRepo = ingredientRepo;
 		this.tacoRepo = tacoRepo;
+		this.userRepo = userRepo;
 	}
 
 	@GetMapping
-	public String showDesignForm(Model model) {
+	public String showDesignForm(Model model, Principal principal) {
 // 일반 배열을 ArrayList로 바꿔야 할 때는 Arrays.asList()를 사용해서 간단하게 바꿀 수 있습니다.
 //		List<Ingredient> ingredients = Arrays.asList(
 //				new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
@@ -63,7 +68,11 @@ public class DesignTacoController {
 			model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
 		}
 
-		model.addAttribute("taco", new Taco());
+//		model.addAttribute("taco", new Taco());
+		String username = principal.getName();
+		User user = userRepo.findByUserName(username);
+		model.addAttribute("user", user);
+		
 		return "design";
 	}
 
@@ -90,8 +99,8 @@ public class DesignTacoController {
 
 		// 이 지점에서 타코 디자인(선택된 식자재 내역)을 저장
 		// 이 작업은 3장에서
-		//log.info("Processing design: " + design);
-		
+		// log.info("Processing design: " + design);
+
 		Taco saved = tacoRepo.save(design);
 		order.addDesign(saved);
 		return "redirect:/orders/current";

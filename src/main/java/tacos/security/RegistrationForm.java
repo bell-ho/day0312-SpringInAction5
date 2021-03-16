@@ -8,14 +8,14 @@ import tacos.User;
 @Data
 public class RegistrationForm {
 
-	private final String username;
-	private final String password;
-	private final String fullname;
-	private final String street;
-	private final String city;
-	private final String state;
-	private final String zip;
-	private final String phone;
+	private String username;
+	private String password;
+	private String fullname;
+	private String street;
+	private String city;
+	private String state;
+	private String zip;
+	private String phone;
 
 	public User toUser(PasswordEncoder passwordEncoder) {
 		return new User(username, passwordEncoder.encode(password), fullname, street, city, state, zip, phone);

@@ -2,8 +2,12 @@ package tacos.web;
 
 import javax.validation.Valid;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,16 +27,19 @@ import tacos.data.OrderRepository;
 @SessionAttributes("order")
 public class OrderController {
 
+	private OrderProps props;
+
 	private OrderRepository orderRepo;
 
-	public OrderController(OrderRepository orderRepo) {
+	public OrderController(OrderRepository orderRepo, OrderProps props) {
+		this.props = props;
 		this.orderRepo = orderRepo;
 	}
 
 	@GetMapping("/current")
-	public String orderForm(@AuthenticationPrincipal User user , @ModelAttribute Order order) {
+	public String orderForm(@AuthenticationPrincipal User user, @ModelAttribute Order order) {
 //		model.addAttribute("order", new Order());
-		
+
 		if (order.getDeliveryName() == null) {
 			order.setDeliveryName(user.getFullname());
 		}
@@ -43,8 +50,12 @@ public class OrderController {
 			order.setDeliveryCity(user.getCity());
 		}
 		if (order.getDeliveryState() == null) {
-			order.setDeliveryZip(user.getState());
+			order.setDeliveryState(user.getState());
 		}
+		if (order.getDeliveryZip() == null) {
+			order.setDeliveryZip(user.getZip());
+		}
+
 		return "orderForm";
 	}
 
@@ -54,12 +65,21 @@ public class OrderController {
 		if (errors.hasErrors()) {
 			return "orderForm";
 		}
-		
+
 		order.setUser(user);
-		
-//		log.info("Order submitted: " + order);
 		orderRepo.save(order);
+
 		sessionStatus.setComplete();
+
 		return "redirect:/";
+	}
+
+	@GetMapping
+	public String ordersForUser(@AuthenticationPrincipal User user, Model model) {
+
+		Pageable pageable = PageRequest.of(0, props.getPageSize());
+
+		model.addAttribute("orders", orderRepo.findByUserOrderByPlacedAtDesc(user, pageable));
+		return "orderList";
 	}
 }

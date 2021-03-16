@@ -47,32 +47,20 @@ public class DesignTacoController {
 
 	@GetMapping
 	public String showDesignForm(Model model, Principal principal) {
-// 일반 배열을 ArrayList로 바꿔야 할 때는 Arrays.asList()를 사용해서 간단하게 바꿀 수 있습니다.
-//		List<Ingredient> ingredients = Arrays.asList(
-//				new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
-//				new Ingredient("COTO", "Corn Tortilla", Type.WRAP), 
-//				new Ingredient("GRBF", "Ground Beef", Type.PROTEIN),
-//				new Ingredient("CARN", "Carnitas", Type.PROTEIN),
-//				new Ingredient("TMTO", "Diced Tomatoes", Type.VEGGIES), 
-//				new Ingredient("LETC", "Lettuce", Type.VEGGIES),
-//				new Ingredient("CHED", "Cheddar", Type.CHEESE), 
-//				new Ingredient("JACK", "Monterry Jack", Type.CHEESE),
-//				new Ingredient("SLSA", "Salsa", Type.SAUCE), 
-//				new Ingredient("SRCR", "Sour Cream", Type.SAUCE));
 
 		List<Ingredient> ingredients = new ArrayList<>();
 		ingredientRepo.findAll().forEach(i -> ingredients.add(i));
-		Type[] types = Ingredient.Type.values();
 
+		Type[] types = Ingredient.Type.values();
 		for (Type type : types) {
 			model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
 		}
 
 //		model.addAttribute("taco", new Taco());
+
 		String username = principal.getName();
-		User user = userRepo.findByUserName(username);
+		User user = userRepo.findByUsername(username);
 		model.addAttribute("user", user);
-		
 		return "design";
 	}
 
@@ -96,10 +84,6 @@ public class DesignTacoController {
 		if (errors.hasErrors()) {
 			return "design";
 		}
-
-		// 이 지점에서 타코 디자인(선택된 식자재 내역)을 저장
-		// 이 작업은 3장에서
-		// log.info("Processing design: " + design);
 
 		Taco saved = tacoRepo.save(design);
 		order.addDesign(saved);

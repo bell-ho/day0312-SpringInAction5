@@ -37,8 +37,9 @@ public class Order implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Date placedAt;
-
-	@ManyToOne	//한 건의 주문이 한 명의 사용자에 속한다는 것, 한명의 사용자는 여러 주문을 가질 수 없다.
+	
+	//한 건의 주문이 한 명의 사용자에 속한다는 것, 한명의 사용자는 여러 주문을 가질 수 없다.
+	@ManyToOne	
 	private User user;
 	
 	// 배달 주소에 관한 속성(street,city,state,zip)들의 경우 사용자가 입력을 하지않은 필드가 있는지 확인만 하면 되므로
